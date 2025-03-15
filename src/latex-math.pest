@@ -1,0 +1,67 @@
+WHITESPACE = _{ NEWLINE }
+
+/* fixed macro or unknown macro */
+fixed_name =  { ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "-")* }
+fixed      = _{ "\\" ~ fixed_name }
+
+/* unary macro */
+unary_name_math = {
+    "mathbb"
+  | "mathfrak"
+  | "mathscr"
+  | "mathcal"
+  | "mathbf"
+  | "mathit"
+  | "mathsf"
+  | "mathtt"
+  | "mathrm"
+}
+
+unary_name_text = {
+    "textbf"
+  | "textit"
+  | "textsf"
+  | "texttt"
+  | "textrm"
+  | "text"
+}
+unary           = { "\\" ~ ((unary_name_math ~ arg) | (unary_name_text ~ text_arg)) }
+
+arg      = _{ mono }
+text_arg = _{ text_mono }
+
+/* special char */
+special = { "\\" | "{" | "}" | "_" | "^" | "%" | "$" }
+
+literal = { !special ~ ANY }
+
+/* slient spaces & text spaces */
+slient_spaces = _{ (" " | "\t")+ }
+spaces        =  { (" " | "\t")+ }
+
+/* non-breaking space */
+tie = { "~" }
+
+/* ascii infix operator */
+ascii_infix = { "+" | "-" | "*" | "/" | "%" }
+
+number =  { ASCII_DIGIT }
+letter =  { ASCII_ALPHA }
+atom   = _{ number | letter | tie | ascii_infix | literal | unary | fixed }
+
+/* mono term */
+mono        = _{ slient_spaces | atom | braced_mono }
+braced_mono =  { "{" ~ formula ~ "}" }
+
+text_mono        = _{ spaces | atom | text_braced_mono }
+text_braced_mono =  { "{" ~ formula ~ "}" }
+
+/* supscript & subscript */
+supscript    = { arg ~ slient_spaces? ~ "^" ~ slient_spaces? ~ arg }
+subscript    = { arg ~ slient_spaces? ~ "_" ~ slient_spaces? ~ arg }
+supsubscript = { supscript ~ "_" ~ slient_spaces? ~ arg }
+subsupscript = { subscript ~ "^" ~ slient_spaces? ~ arg }
+
+attach = _{ supsubscript | subsupscript | supscript | subscript }
+
+formula = _{ (attach | mono)* }

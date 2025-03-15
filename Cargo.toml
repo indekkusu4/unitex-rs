@@ -1,0 +1,12 @@
+[package]
+name = "unitex-rs"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+pest = { version = "2", default-features = false }
+pest_derive = { version = "2" }
+phf = { version = "0.11.3", features = ["macros"] }
+
+[profile.release]
+strip = true

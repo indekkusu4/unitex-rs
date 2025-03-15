@@ -1,0 +1,11 @@
+
+not_dollar = _{ (!"$" ~ ANY)+ }
+
+inline_math = { not_dollar }
+inline_math_span = _{ "$" ~ inline_math ~ "$" }
+
+block_math = { not_dollar }
+block_math_span = _{ "$$" ~ block_math ~ "$$" }
+
+text = { not_dollar }
+content = { (text | block_math_span | inline_math_span)* }
